@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Vada Pav Near You</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Find Vada Pav Near You</h1>
+        <form id="locationForm">
+            <label for="lat">Latitude:</label>
+            <input type="text" id="lat" name="lat" required>
+            <label for="lng">Longitude:</label>
+            <input type="text" id="lng" name="lng" required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="results"></div>
+    </div>
+    <script>
+        document.getElementById('locationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const lat = document.getElementById('lat').value;
+            const lng = document.getElementById('lng').value;
+            fetch(`/search?lat=${lat}&lng=${lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(place => {
+                            const placeDiv = document.createElement('div');
+                            placeDiv.className = 'place';
+                            placeDiv.innerHTML = `
+                                <h2>${place.name}</h2>
+                                <p><strong>Address:</strong> ${place.address}</p>
+                                <p><strong>Rating:</strong> ${place.rating} (${place.user_ratings_total} ratings)</p>
+                            `;
+                            resultsDiv.appendChild(placeDiv);
+                        });
+                    } else {
+                        resultsDiv.innerHTML = '<p>No Vada Pav places found nearby.</p>';
+                    }
+                });
+        });
+    </script>
+</body>
+</html>
